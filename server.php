@@ -3,23 +3,16 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/vendor/autoload.php';
+require __DIR__.'/vendor/autoload.php';
 
-use Msuranek\McpServerPhp\McpServer;
-use Msuranek\McpServerPhp\Tools\QueryDatabaseTool;
+use Mcp\Server\Transport\StdioTransport;
+use Msuranek\McpServerPhp\ApplicationFactory;
+use Msuranek\McpServerPhp\Config\ServerConfig;
 
-// --- Configure your data source here ---
-$pdo = new PDO(
-	dsn: 'mysql:host=127.0.0.1;dbname=' . ($_ENV['DB_NAME'] ?? 'mydb') . ';charset=utf8mb4',
-	username: $_ENV['DB_USER'] ?? 'readonly_user',
-	password: $_ENV['DB_PASS'] ?? '',
-	options: [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION],
-);
-
-// Only expose these tables to Claude
-$allowedTables = ['products', 'categories', 'orders'];
-
-// --- Build and run server ---
-$server = new McpServer('My App Database', '1.0.0');
-$server->addTool(new QueryDatabaseTool($pdo, $allowedTables, maxRows: 100));
-$server->run();
+try {
+    $server = ApplicationFactory::create(ServerConfig::fromEnvironment());
+    exit($server->run(new StdioTransport()));
+} catch (Throwable $exception) {
+    fwrite(STDERR, '[secure-database-mcp] '.$exception->getMessage().PHP_EOL);
+    exit(1);
+}

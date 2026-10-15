@@ -1,0 +1,6 @@
+{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"ci-smoke-test","version":"1.0.0"}}}
+{"jsonrpc":"2.0","method":"notifications/initialized"}
+{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}
+{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"query_records","arguments":{"table":"customers","columns":["company_name","region"],"filters":[{"column":"region","operator":"eq","value":"EU"}],"limit":5,"orderBy":"company_name","direction":"asc"}}}
+{"jsonrpc":"2.0","id":4,"method":"resources/list","params":{}}
+{"jsonrpc":"2.0","id":5,"method":"resources/read","params":{"uri":"database://schema"}}

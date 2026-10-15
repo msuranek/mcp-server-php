@@ -1,0 +1,13 @@
+/.env
+/.env.local
+/.env.*.local
+/.idea/
+/.phpunit.cache/
+/.phpunit.result.cache
+/.DS_Store
+/auth.json
+/coverage/
+/clover.xml
+/vendor/
+/var/*
+!/var/.gitkeep

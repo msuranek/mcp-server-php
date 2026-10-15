@@ -1,0 +1,40 @@
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: mcp_demo
+      POSTGRES_USER: mcp_admin
+      POSTGRES_PASSWORD: mcp_admin_demo_password
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mcp_admin -d mcp_demo"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+    volumes:
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/10-demo.sql:ro
+
+  server:
+    image: mcp-server-php:local
+    build: .
+    environment:
+      DB_DSN: pgsql:host=db;port=5432;dbname=mcp_demo
+      DB_USER: mcp_reader
+      DB_PASSWORD: mcp_reader_demo_password
+      DB_ALLOWED_TABLES: customers,orders,order_items
+      DB_MAX_ROWS: 100
+      DB_QUERY_TIMEOUT_MS: 3000
+      DB_REQUIRE_READ_ONLY: "true"
+      AUDIT_LOG_PATH: /app/var/audit.jsonl
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - audit-data:/app/var
+
+  test:
+    image: mcp-server-php:local
+    entrypoint: ["vendor/bin/phpunit"]
+    profiles: ["tools"]
+
+volumes:
+  audit-data:
